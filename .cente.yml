@@ -1,0 +1,13 @@
+runner: blogc
+
+jobs:
+  distckeck-gcc:
+    env:
+      - TARGET=distcheck
+      - CC=gcc
+  valgrind-gcc:
+    env:
+      - TARGET=valgrind
+      - CC=gcc
+
+script: curl -sSf https://yatr.rgm.io/run.sh | bash
