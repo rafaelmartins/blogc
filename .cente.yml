@@ -2,11 +2,11 @@ runner: blogc
 
 jobs:
   distckeck-gcc:
-    env:
+    environment:
       - TARGET=distcheck
       - CC=gcc
   valgrind-gcc:
-    env:
+    environment:
       - TARGET=valgrind
       - CC=gcc
 
