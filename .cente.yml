@@ -11,5 +11,5 @@ jobs:
       - CC=gcc
 
 script: |
-  apk add --no-cache git gcc musl-dev cmocka-dev bash
+  apk add --no-cache git gcc musl-dev cmocka-dev bash curl
   curl -sSf https://yatr.rgm.io/run.sh | bash
