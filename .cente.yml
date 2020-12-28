@@ -1,4 +1,4 @@
-runner: ssh://blogc
+runner: docker://alpine:latest
 
 jobs:
   distckeck-gcc:
@@ -10,4 +10,6 @@ jobs:
       - TARGET=valgrind
       - CC=gcc
 
-script: curl -sSf https://yatr.rgm.io/run.sh | bash
+script: |
+  apk add --no-cache git gcc musl-dev cmocka-dev bash
+  curl -sSf https://yatr.rgm.io/run.sh | bash
