@@ -1,4 +1,4 @@
-runner: docker://alpine:latest
+runner: docker://
 
 jobs:
   distckeck-gcc:
