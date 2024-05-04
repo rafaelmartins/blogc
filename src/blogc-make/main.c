@@ -19,6 +19,10 @@
 #include "ctx.h"
 #include "rules.h"
 
+#ifndef PACKAGE_VERSION
+#define PACKAGE_VERSION "Unknown"
+#endif
+
 
 static void
 print_help(void)
@@ -75,7 +79,7 @@ main(int argc, char **argv)
                     print_help();
                     goto cleanup;
                 case 'v':
-                    printf("%s\n", PACKAGE_STRING);
+                    printf("blogc " PACKAGE_VERSION "\n");
                     goto cleanup;
                 case 'D':
                     dev = true;

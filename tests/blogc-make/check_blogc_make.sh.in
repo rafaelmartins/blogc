@@ -4,7 +4,8 @@ set -xe -o pipefail
 
 export LC_ALL=C
 
-export BLOGC=@abs_top_builddir@/blogc
+export BLOGC="@CMAKE_BINARY_DIR@/src/blogc/blogc"
+export BLOGC_MAKE="@CMAKE_BINARY_DIR@/src/blogc-make/blogc-make"
 
 TEMP="$(mktemp -d)"
 [[ -n "${TEMP}" ]]
@@ -30,7 +31,7 @@ SITE_TAGLINE = WAT?!
 BASE_DOMAIN = http://example.org
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1
 
 
 ### default settings with some posts
@@ -78,7 +79,7 @@ foo
 bar
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/page/1/index\\.html" "${TEMP}/output.txt"
@@ -195,7 +196,7 @@ post10
 post11
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/post/post01/index\\.html" "${TEMP}/output.txt"
@@ -484,7 +485,7 @@ cat > "${TEMP}/proj/templates/atom.tmpl" <<EOF
 </feed>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/post/post01/index\\.html" "${TEMP}/output.txt"
@@ -692,7 +693,7 @@ post10
 post11
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/post/post01/index\\.html" "${TEMP}/output.txt"
 grep "_build/post/post02/index\\.html" "${TEMP}/output.txt"
 grep "_build/post/post03/index\\.html" "${TEMP}/output.txt"
@@ -766,7 +767,7 @@ qwe
 asd
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/post/post01/index\\.html" "${TEMP}/output.txt"
 grep "_build/post/post02/index\\.html" "${TEMP}/output.txt"
 grep "_build/post/post03/index\\.html" "${TEMP}/output.txt"
@@ -871,7 +872,7 @@ foo
 bar
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/page/1/index\\.html" "${TEMP}/output.txt"
@@ -978,7 +979,7 @@ foo
 bar
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/page/1/index\\.html" "${TEMP}/output.txt"
@@ -1093,7 +1094,7 @@ foo
 bar
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/page/1/index\\.html" "${TEMP}/output.txt"
@@ -1200,7 +1201,7 @@ tag1
 tag2
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/atom/tag1\\.xml" "${TEMP}/output.txt"
@@ -1405,7 +1406,7 @@ page1
 page2
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/atom\\.xml" "${TEMP}/output.txt"
 grep "_build/atom/tag1\\.xml" "${TEMP}/output.txt"
@@ -1528,7 +1529,7 @@ foo
 bar
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/posts\\.html" "${TEMP}/output.txt"
 grep "_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "_build/pagination/1\\.html" "${TEMP}/output.txt"
@@ -1628,7 +1629,7 @@ tag1
 tag2
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/posts\\.html" "${TEMP}/output.txt"
 grep "_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "_build/atoom/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -1777,7 +1778,7 @@ page1
 page2
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/posts\\.html" "${TEMP}/output.txt"
 grep "_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "_build/atoom/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -1861,7 +1862,7 @@ d/xd
 f
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/posts\\.html" "${TEMP}/output.txt"
 grep "_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "_build/atoom/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -1900,7 +1901,7 @@ test "$(cat "${TEMP}/proj/_build/f/XDDDD")" = "FFFUUUUUU"
 
 ### clean rule
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" clean 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" clean 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/posts\\.html" "${TEMP}/output.txt"
 grep "_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "_build/atoom/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -1933,7 +1934,7 @@ rm "${TEMP}/output.txt"
 
 export OUTPUT_DIR="${TEMP}/___blogc_build"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "___blogc_build/posts\\.html" "${TEMP}/output.txt"
 grep "___blogc_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "___blogc_build/atoom/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -1962,7 +1963,7 @@ grep "___blogc_build/f/XDDDD" "${TEMP}/output.txt"
 
 rm "${TEMP}/output.txt"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" clean 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" clean 2>&1 | tee "${TEMP}/output.txt"
 grep "___blogc_build/posts\\.html" "${TEMP}/output.txt"
 grep "___blogc_build/atoom/index\\.xml" "${TEMP}/output.txt"
 grep "___blogc_build/atoom/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -1998,7 +1999,7 @@ unset OUTPUT_DIR
 
 ### atom_dump rule
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" atom_dump | tee "${TEMP}/atom.xml"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" atom_dump | tee "${TEMP}/atom.xml"
 
 cat > "${TEMP}/expected-atom-dump.xml" <<EOF
 <?xml version="1.0" encoding="utf-8"?>
@@ -2098,7 +2099,7 @@ foo
 bar
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/index\\.xml" "${TEMP}/output.txt"
 grep "_build/1/index\\.html" "${TEMP}/output.txt"
@@ -2228,7 +2229,7 @@ tag1
 tag2
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/index\\.xml" "${TEMP}/output.txt"
 grep "_build/tag1/index\\.xml" "${TEMP}/output.txt"
@@ -2403,7 +2404,7 @@ page1
 page2
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc-make -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
+${TESTS_ENVIRONMENT} ${BLOGC_MAKE} -f "${TEMP}/proj/blogcfile" 2>&1 | tee "${TEMP}/output.txt"
 grep "_build/index\\.html" "${TEMP}/output.txt"
 grep "_build/index\\.xml" "${TEMP}/output.txt"
 grep "_build/tag1/index\\.xml" "${TEMP}/output.txt"

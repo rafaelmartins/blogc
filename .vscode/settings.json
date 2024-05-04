@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.sh.in": "shellscript"
+    },
+    "[shellscript]": {
+        "files.trimTrailingWhitespace": false
+    },
+}

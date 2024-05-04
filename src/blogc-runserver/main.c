@@ -16,6 +16,10 @@
 #include "../common/utils.h"
 #include "httpd.h"
 
+#ifndef PACKAGE_VERSION
+#define PACKAGE_VERSION "Unknown"
+#endif
+
 
 static void
 print_help(const char *default_host, const char *default_port)
@@ -76,7 +80,7 @@ main(int argc, char **argv)
                     print_help(default_host, default_port);
                     goto cleanup;
                 case 'v':
-                    printf("%s\n", PACKAGE_STRING);
+                    printf("blogc " PACKAGE_VERSION "\n");
                     goto cleanup;
                 case 't':
                     if (argv[i][2] != '\0')

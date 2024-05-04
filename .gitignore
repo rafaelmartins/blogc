@@ -28,6 +28,7 @@ Makefile.in
 /configure
 /configure~
 /config.*
+!/config.h.in
 /autom4te.cache
 /libtool
 /stamp-h1
@@ -122,3 +123,5 @@ blogc-*.rpm
 /maint/releases/
 
 .gdb_history
+
+/Testing
