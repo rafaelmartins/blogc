@@ -161,7 +161,7 @@ main(int argc, char **argv)
                     blogc_print_help();
                     goto cleanup;
                 case 'v':
-                    printf("%s\n", PACKAGE_STRING);
+                    printf("blogc " PACKAGE_VERSION "\n");
                     goto cleanup;
                 case 'd':
                     debug = true;

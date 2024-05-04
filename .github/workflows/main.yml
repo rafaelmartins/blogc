@@ -1,0 +1,263 @@
+name: Main
+
+on:
+  - push
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - ubuntu-latest
+        cc:
+          - gcc
+          - clang
+        variant:
+          - default
+          - memcheck
+          - make-embedded
+        include:
+          - os: macos-latest
+            cc: clang
+            variant: default
+          - os: ubuntu-latest
+            cc: clang
+            variant: clang-analyzer
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Install dependencies (Ubuntu)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt install -y libcmocka-dev ninja-build ronn
+          if [[ "${{ matrix.variant }}" = "memcheck" ]]; then
+            sudo apt install -y valgrind
+          fi
+          if [[ "${{ matrix.variant }}" = "clang-analyzer" ]]; then
+            sudo apt install -y clang-tools
+          fi
+
+      - name: Install dependencies (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          brew install cmocka coreutils groff ninja
+          gem install ronn-ng
+
+      - name: Setup clang-analyzer wrapper (if needed)
+        id: clang-analyzer
+        run: |
+          wrapper=
+          if [[ "${{ matrix.variant }}" = "clang-analyzer" ]]; then
+            wrapper="scan-build -o ${{ github.workspace }}/reports --use-cc=clang"
+          fi
+          echo "wrapper=${wrapper}" >> $GITHUB_OUTPUT
+
+      - name: Configure CMake (default)
+        if: ${{ matrix.variant != 'make-embedded' }}
+        run: |
+          ${{ steps.clang-analyzer.outputs.wrapper }} cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DBUILD_BLOGC_GIT_RECEIVER=ON \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_RUNSERVER=ON \
+            -DBUILD_MANPAGES=ON \
+            -DBUILD_TESTING=ON \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Configure CMake (make-embedded)
+        if: ${{ matrix.variant == 'make-embedded' }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DBUILD_BLOGC_MAKE_EMBEDDED=ON \
+            -DBUILD_TESTING=ON \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Build
+        run: |
+          ${{ steps.clang-analyzer.outputs.wrapper }} cmake \
+            --build ${{ github.workspace }}/build \
+            --config RelWithDebInfo
+
+      - name: Test (default)
+        working-directory: ${{ github.workspace }}/build
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          ${{ steps.clang-analyzer.outputs.wrapper }} ctest \
+            --verbose \
+            --build-config RelWithDebInfo
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.variant == 'clang-analyzer' }}
+        id: clang-analyzer-upload
+        with:
+          name: clang-analyzer
+          path: reports
+          if-no-files-found: ignore
+
+      - name: Check clang-analyzer status
+        if: ${{ matrix.variant == 'clang-analyzer' && steps.clang-analyzer-upload.outputs.artifact-id != '' }}
+        run: |
+          echo "::error title=Error hint::clang-analyzer found bugs!"
+          exit 1
+
+  package:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        pkg:
+          - source
+          - linux-amd64
+          - linux-amd64-static
+          - linux-amd64-make-embedded
+          - linux-amd64-make-embedded-static
+          - windows-i686
+          - windows-amd64
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y ninja-build ronn
+          if [[ "${{ matrix.pkg }}" = "windows-i686" ]]; then
+            sudo apt install -y gcc-mingw-w64-i686
+          fi
+          if [[ "${{ matrix.pkg }}" = "windows-amd64" ]]; then
+            sudo apt install -y gcc-mingw-w64-x86-64
+          fi
+          if [[ "${{ matrix.pkg }}" = *-static ]]; then
+            sudo apt install -y musl-dev
+          fi
+
+      - name: Configure CMake (Default)
+        if: ${{ !startsWith(matrix.pkg, 'windows-') }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=$([[ "${{ matrix.pkg }}" = *-static ]] && echo x86_64-linux-musl-gcc || echo gcc) \
+            -DCMAKE_C_FLAGS="-Wall" \
+            -DCMAKE_EXE_LINKER_FLAGS="$([[ "${{ matrix.pkg }}" = *-static ]] && echo -static)" \
+            -DCPACK_PACKAGE_FILE_NAME_SUFFIX="$([[ "${{ matrix.pkg }}" != "source" ]] && echo "${{ matrix.pkg }}")" \
+            -DBUILD_BLOGC_GIT_RECEIVER=$([[ "${{ matrix.pkg }}" != *-make-embedded* ]] && echo ON || echo OFF) \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_MAKE_EMBEDDED=$([[ "${{ matrix.pkg }}" = *-make-embedded* ]] && echo ON || echo OFF) \
+            -DBUILD_BLOGC_RUNSERVER=$([[ "${{ matrix.pkg }}" != *-make-embedded* ]] && echo ON || echo OFF) \
+            -DBUILD_MANPAGES=$([[ "${{ matrix.pkg }}" != *-make-embedded* ]] && echo ON || echo OFF) \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Configure CMake (Windows)
+        if: ${{ startsWith(matrix.pkg, 'windows-') }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=$([[ "${{ matrix.pkg }}" = "windows-i686" ]] && echo i686-w64-mingw32-gcc || echo x86_64-w64-mingw32-gcc) \
+            -DCMAKE_C_FLAGS="-Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4" \
+            -DCMAKE_SYSTEM_NAME=Windows \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Build
+        run: |
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release \
+            --target $([[ "${{ matrix.pkg }}" = "source" ]] && echo package_source || echo package)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.pkg }}
+          path: build/blogc-*
+
+  validate-source:
+    runs-on: ubuntu-latest
+    needs: package
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: source
+          path: source
+
+      - name: Install dependencies
+        run: sudo apt install -y ninja-build ronn
+
+      - name: Validate source
+        run: |
+          pushd source > /dev/null
+          sha512sum -c blogc-*.tar.xz.sha512
+          popd > /dev/null
+
+          tar -xvf source/blogc-*.tar.xz
+
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=gcc \
+            -DBUILD_BLOGC_GIT_RECEIVER=ON \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_RUNSERVER=ON \
+            -DBUILD_MANPAGES=ON \
+            -S ${{ github.workspace }}/blogc-* \
+            -G Ninja
+
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release
+
+          ${{ github.workspace }}/build/src/blogc/blogc -v | grep -iv Unknown
+          ${{ github.workspace }}/build/src/blogc-make/blogc-make -v | grep -iv Unknown
+          ${{ github.workspace }}/build/src/blogc-runserver/blogc-runserver -v | grep -iv Unknown
+
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - test
+      - validate-source
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Get release metadata
+        id: meta
+        run: |
+          version="$(echo "${{ github.ref }}" | sed 's,refs/tags/v,,')"
+          echo "name=$(git tag -l --format="%(contents:subject)" "v${version}")" >> $GITHUB_OUTPUT
+          git tag -l --format="%(contents:body)" "v${version}" > body.txt
+
+      - uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
+        with:
+          name: ${{ steps.meta.outputs.name }}
+          artifacts: "artifacts/blogc-*"
+          bodyFile: body.txt
+          generateReleaseNotes: true

@@ -1,24 +1,50 @@
 # blogc
 
-![Build Status](https://github.com/blogc/blogc/workflows/yatr/badge.svg)
-
 A blog compiler.
 
 
 ## Quickstart
 
-Clone the [Git repository](https://github.com/blogc/blogc) or grab the [latest release](https://github.com/blogc/blogc/releases) and extract it.
+Clone the [Git repository](https://github.com/blogc/blogc) or grab the [latest release's source tarball](https://github.com/blogc/blogc/releases) and extract it.
 
-If installing from Git repository, [ronn](https://github.com/rtomayko/ronn) and [GNU Autotools](http://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html) must be installed in the machine. Release tarballs does not have these dependencies and are the recommended way to install.
+
+### Dependencies
+
+Building `blogc` requires:
+
+- [CMake](https://cmake.org/)
+- [Ninja](https://ninja-build.org/) (optional, but recommended)
+- [ronn-ng](https://github.com/apjanke/ronn-ng) (if configured with `BUILD_MANPAGES=ON`)
+- [cmocka](https://cmocka.org/) (if configured with `BUILD_TESTING=ON`)
+- bash, diff and tee (if configured with `BUILD_TESTING=ON`)
+- git, make and tar (if configured with `BUILD_TESTING=ON` and `BUILD_BLOGC_GIT_RECEIVER=ON`)
+
+Running the `blogc-git-receiver` tool requires:
+
+- git, make and tar
+
+
+### Building and installing
 
 Inside the source directory, run the following commands:
 
-    $ ./autogen.sh  # if installing from git
-    $ ./configure [--enable-git-receiver] [--enable-make] [--enable-runserver]
-    $ make
-    # make install
-
-The `./configure` options listed above will enable building of helper tools. To learn more about these tools, please read the man pages.
+    $ mkdir build
+    $ cmake \
+          -B build \
+          -S . \
+          -G Ninja \
+          [-DBUILD_BLOGC_GIT_RECEIVER=ON] \
+          [-DBUILD_BLOGC_MAKE=ON] \
+          [-DBUILD_BLOGC_RUNSERVER=ON] \
+          [-DBUILD_MANPAGES=ON] \
+          [-DBUILD_TESTING=ON]
+    $ cmake \
+          --build build \
+          --config Release
+    # cmake \
+          --build build \
+          --config Release \
+          --target install
 
 To create your first blog, please clone our example repository and adapt it to your needs:
 

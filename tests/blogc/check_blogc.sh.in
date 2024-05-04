@@ -4,6 +4,8 @@ set -xe -o pipefail
 
 export LC_ALL=C
 
+export BLOGC="@CMAKE_BINARY_DIR@/src/blogc/blogc"
+
 TEMP="$(mktemp -d)"
 [[ -n "${TEMP}" ]]
 
@@ -13,7 +15,7 @@ trap_func() {
 
 trap trap_func EXIT
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc -v | grep blogc
+${TESTS_ENVIRONMENT} ${BLOGC} -v | grep blogc
 
 cat > "${TEMP}/post1.txt" <<EOF
 TITLE: foo
@@ -109,7 +111,7 @@ cat > "${TEMP}/expected-output.xml" <<EOF
 </feed>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D AUTHOR_NAME=Chunda \
@@ -123,7 +125,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output.xml" "${TEMP}/expected-output.xml"
 
-echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D AUTHOR_NAME=Chunda \
@@ -137,7 +139,7 @@ echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_b
 
 diff -uN "${TEMP}/output2.xml" "${TEMP}/expected-output.xml"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D AUTHOR_NAME=Chunda \
@@ -150,7 +152,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output3.xml" "${TEMP}/expected-output.xml"
 
-echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D AUTHOR_NAME=Chunda \
@@ -256,7 +258,7 @@ cat > "${TEMP}/expected-output.html" <<EOF
 </html>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -269,7 +271,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output.html" "${TEMP}/expected-output.html"
 
-echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -282,7 +284,7 @@ echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_b
 
 diff -uN "${TEMP}/output2.html" "${TEMP}/expected-output.html"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -294,7 +296,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output3.html" "${TEMP}/expected-output.html"
 
-echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -339,7 +341,7 @@ cat > "${TEMP}/expected-output2.html" <<EOF
 </html>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -350,7 +352,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output5.html" "${TEMP}/expected-output2.html"
 
-echo -e "${TEMP}/post1.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -361,7 +363,7 @@ echo -e "${TEMP}/post1.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output6.html" "${TEMP}/expected-output2.html"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -371,7 +373,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output7.html" "${TEMP}/expected-output2.html"
 
-echo -e "${TEMP}/post1.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -419,7 +421,7 @@ cat > "${TEMP}/expected-output3.html" <<EOF
 </html>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -432,7 +434,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output9.html" "${TEMP}/expected-output3.html"
 
-echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -445,7 +447,7 @@ echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_b
 
 diff -uN "${TEMP}/output10.html" "${TEMP}/expected-output3.html"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -457,7 +459,7 @@ ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
 
 diff -uN "${TEMP}/output11.html" "${TEMP}/expected-output3.html"
 
-echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+echo -e "${TEMP}/post1.txt\n${TEMP}/post2.txt" | ${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -507,7 +509,7 @@ cat > "${TEMP}/expected-output4.html" <<EOF
 </html>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -562,7 +564,7 @@ cat > "${TEMP}/expected-output5.html" <<EOF
 </html>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -604,7 +606,7 @@ cat > "${TEMP}/expected-output6.html" <<EOF
 </html>
 EOF
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D BASE_DOMAIN=http://bola.com/ \
     -D BASE_URL= \
     -D SITE_TITLE="Chunda's website" \
@@ -617,20 +619,20 @@ diff -uN "${TEMP}/output15.html" "${TEMP}/expected-output6.html"
 
 echo "{% block listig %}foo{% endblock %}\n" > "${TEMP}/error.tmpl"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -t "${TEMP}/error.tmpl" \
     "${TEMP}/post1.txt" 2>&1 | tee "${TEMP}/output.txt" || true
 
 grep "blogc: error: template: Invalid block type" "${TEMP}/output.txt"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D 123=a 2>&1 | tee "${TEMP}/output.txt" || true
 
 grep \
     "blogc: error: invalid value for -D (first character in configuration key must be uppercase): 123" \
     "${TEMP}/output.txt"
 
-${TESTS_ENVIRONMENT} @abs_top_builddir@/blogc \
+${TESTS_ENVIRONMENT} ${BLOGC} \
     -D A1-3=a 2>&1 | tee "${TEMP}/output.txt" || true
 
 grep \

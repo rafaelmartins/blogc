@@ -1,0 +1,36 @@
+/*
+ * blogc: A blog compiler.
+ * Copyright (C) 2014-2024 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ *
+ * This program can be distributed under the terms of the BSD License.
+ * See the file LICENSE.
+ */
+
+#ifndef __CONFIG_H
+#define __CONFIG_H
+
+#cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
+
+#cmakedefine HAVE_GETRUSAGE
+#cmakedefine HAVE_GETHOSTNAME
+
+#cmakedefine HAVE_ARPA_INET_H
+#cmakedefine HAVE_DIRENT_H
+#cmakedefine HAVE_ERRNO_H
+#cmakedefine HAVE_FCNTL_H
+#cmakedefine HAVE_LIBGEN_H
+#cmakedefine HAVE_LIMITS_H
+#cmakedefine HAVE_NETDB_H
+#cmakedefine HAVE_NETINET_IN_H
+#cmakedefine HAVE_SIGNAL_H
+#cmakedefine HAVE_SYSEXITS_H
+#cmakedefine HAVE_SYS_RESOURCE_H
+#cmakedefine HAVE_SYS_SOCKET_H
+#cmakedefine HAVE_SYS_STAT_H
+#cmakedefine HAVE_SYS_TIME_H
+#cmakedefine HAVE_SYS_TYPES_H
+#cmakedefine HAVE_SYS_WAIT_H
+#cmakedefine HAVE_TIME_H
+#cmakedefine HAVE_UNISTD_H
+
+#endif /* __CONFIG_H */

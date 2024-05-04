@@ -4,6 +4,8 @@ set -xe -o pipefail
 
 export LC_ALL=C
 
+export BLOGC_GIT_RECEIVER="@CMAKE_BINARY_DIR@/src/blogc-git-receiver/blogc-git-receiver"
+
 TEMP="$(mktemp -d)"
 [[ -n "${TEMP}" ]]
 
@@ -17,7 +19,7 @@ trap trap_func EXIT
 mkdir -p "${TEMP}/repos"
 git init --bare "${TEMP}/repos/foo.git" &> /dev/null
 
-SELF="@abs_top_builddir@/blogc-git-receiver"
+SELF="${BLOGC_GIT_RECEIVER}"
 
 ln -s "${SELF}" "${TEMP}/repos/foo.git/hooks/pre-receive"
 

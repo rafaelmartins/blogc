@@ -1,124 +1,15 @@
-# Object files
-*.o
-*.ko
-
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Autotools
+# CMake
+build*/
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
 Makefile
-Makefile.in
-.deps
-.libs
-*.la
-*.lo
-/aclocal.m4
-/configure
-/configure~
-/config.*
-/autom4te.cache
-/libtool
-/stamp-h1
-.dirstamp
-/build-aux/*
-!/build-aux/build-*.sh
-!/build-aux/check-make-embedded.sh
-!/build-aux/clang-analyzer.sh
-!/build-aux/git-version-gen
-!/build-aux/valgrind.sh
-
-# debian
-debian/.debhelper
-debian/autoreconf.*
-debian/*.log
-debian/*.substvars
-debian/debhelper-build-stamp
-debian/files
-debian/blogc/
-debian/blogc-git-receiver/
-debian/blogc-make/
-debian/blogc-runserver/
-debian/tmp/
-
-# installed .m4 files
-/m4/*.m4
-!/m4/ax_pthread.m4
-!/m4/pkg.m4
-
-# man pages
-/blogc*.[157]
-blogc*.html
-
-# binaries
-/blogc
-/blogc-git-receiver
-/blogc-make
-/blogc-runserver
-
-# tests
-/tests/blogc/check_blogc.sh
-/tests/blogc/check_content_parser
-/tests/blogc/check_datetime_parser
-/tests/blogc/check_filelist_parser
-/tests/blogc/check_funcvars
-/tests/blogc/check_loader
-/tests/blogc/check_renderer
-/tests/blogc/check_rusage
-/tests/blogc/check_source_parser
-/tests/blogc/check_sysinfo
-/tests/blogc/check_sysinfo2
-/tests/blogc/check_template_parser
-/tests/blogc/check_toctree
-/tests/blogc-git-receiver/check_pre_receive_parser
-/tests/blogc-git-receiver/check_pre_receive.sh
-/tests/blogc-git-receiver/check_post_receive.sh
-/tests/blogc-git-receiver/check_settings
-/tests/blogc-git-receiver/check_shell_command_parser
-/tests/blogc-git-receiver/check_shell.sh
-/tests/blogc-make/check_atom
-/tests/blogc-make/check_blogc_make.sh
-/tests/blogc-make/check_exec
-/tests/blogc-make/check_rules
-/tests/blogc-make/check_settings
-/tests/blogc-make/check_utils
-/tests/blogc-runserver/check_httpd_utils
-/tests/blogc-runserver/check_mime
-/tests/common/check_config_parser
-/tests/common/check_error
-/tests/common/check_sort
-/tests/common/check_stdin
-/tests/common/check_utf8
-/tests/common/check_utils
-
-# tarballs
-blogc-*.tar.*
-blogc-*.zip
-
-# rpms
-blogc.spec
-blogc-*.rpm
-
-# git-version-gen
-/.version
-
-# scan-build reports
-*.plist
-
-/build/
-/root/
-
-/maint/releases/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
 
 .gdb_history
