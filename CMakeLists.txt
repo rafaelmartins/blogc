@@ -8,10 +8,12 @@ project(blogc C)
 # explicitly disable tests by default.
 option(BUILD_TESTING "Build the testing tree." OFF)
 
+enable_testing()
+
 include(CheckFunctionExists)
 include(CheckIncludeFile)
+include(CTest)
 include(GNUInstallDirs)
-include(cmake/AddCMockaTest.cmake)
 
 check_function_exists(getrusage HAVE_GETRUSAGE)
 check_function_exists(gethostname HAVE_GETHOSTNAME)
@@ -34,4 +36,7 @@ add_compile_definitions(HAVE_CONFIG_H)
 
 add_subdirectory(man)
 add_subdirectory(src)
-add_subdirectory(tests)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
