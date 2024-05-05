@@ -16,6 +16,9 @@ jobs:
         cc:
           - gcc
           - clang
+        variant:
+          - default
+          - memcheck
         include:
           - os: macos-latest
             cc: clang
@@ -25,7 +28,7 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt install -y libcmocka-dev ronn ninja-build
+      run: sudo apt install -y libcmocka-dev ninja-build ronn valgrind
 
     - name: Install dependencies (MacOS)
       if: ${{ matrix.os == 'macos-latest' }}
@@ -54,4 +57,6 @@ jobs:
 
     - name: Test
       working-directory: ${{ github.workspace }}/build
-      run: ctest --build-config Release
+      env:
+        VARIANT: ${{ matrix.variant }}
+      run: ctest --verbose --build-config Release

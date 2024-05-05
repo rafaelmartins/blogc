@@ -39,6 +39,7 @@ Makefile.in
 !/build-aux/clang-analyzer.sh
 !/build-aux/git-version-gen
 !/build-aux/valgrind.sh
+!/build-aux/test.sh
 
 # debian
 debian/.debhelper

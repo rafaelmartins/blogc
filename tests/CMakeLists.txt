@@ -49,8 +49,11 @@ function(blogc_executable_test _libname _src)
         lib${_libname}
     )
 
-    add_test(${_libname}_check_${_src}
-        ${_libname}_check_${_src}
+    add_test(
+        NAME ${_libname}_check_${_src}
+        COMMAND
+            ${CMAKE_SOURCE_DIR}/build-aux/test.sh
+            ${CMAKE_CURRENT_BINARY_DIR}/${_libname}_check_${_src}
     )
 endfunction()
 
@@ -62,7 +65,9 @@ function(blogc_script_test _libname _src)
     )
     add_test(
         NAME ${_libname}_check_${_src}.sh
-        COMMAND ${_libname}_check_${_src}.sh
+        COMMAND
+            ${CMAKE_SOURCE_DIR}/build-aux/test.sh
+            ${CMAKE_CURRENT_BINARY_DIR}/${_libname}_check_${_src}.sh
     )
 endfunction()
 
