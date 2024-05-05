@@ -1,0 +1,57 @@
+name: Test
+
+on:
+  - push
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - ubuntu-latest
+        cc:
+          - gcc
+          - clang
+        include:
+          - os: macos-latest
+            cc: clang
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: sudo apt install -y libcmocka-dev ronn ninja-build
+
+    - name: Install dependencies (MacOS)
+      if: ${{ matrix.os == 'macos-latest' }}
+      run: |
+        brew install cmocka coreutils groff ninja
+        gem install ronn-ng
+
+    - name: Configure CMake
+      run: |
+        cmake \
+          -B ${{ github.workspace }}/build \
+          -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+          -DBUILD_BLOGC_GIT_RECEIVER=ON \
+          -DBUILD_BLOGC_MAKE=ON \
+          -DBUILD_BLOGC_RUNSERVER=ON \
+          -DBUILD_MANPAGES=ON \
+          -DBUILD_TESTING=ON \
+          -S ${{ github.workspace }} \
+          -G Ninja
+
+    - name: Build
+      run: |
+        cmake \
+          --build ${{ github.workspace }}/build \
+          --config Release
+
+    - name: Test
+      working-directory: ${{ github.workspace }}/build
+      run: ctest --build-config Release
