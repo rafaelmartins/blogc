@@ -19,6 +19,7 @@ jobs:
         variant:
           - default
           - memcheck
+          - make-embedded
         include:
           - os: macos-latest
             cc: clang
@@ -36,7 +37,8 @@ jobs:
         brew install cmocka coreutils groff ninja
         gem install ronn-ng
 
-    - name: Configure CMake
+    - name: Configure CMake (default)
+      if: ${{ matrix.variant != 'make-embedded' }}
       run: |
         cmake \
           -B ${{ github.workspace }}/build \
@@ -45,6 +47,17 @@ jobs:
           -DBUILD_BLOGC_MAKE=ON \
           -DBUILD_BLOGC_RUNSERVER=ON \
           -DBUILD_MANPAGES=ON \
+          -DBUILD_TESTING=ON \
+          -S ${{ github.workspace }} \
+          -G Ninja
+
+    - name: Configure CMake (make-embedded)
+      if: ${{ matrix.variant == 'make-embedded' }}
+      run: |
+        cmake \
+          -B ${{ github.workspace }}/build \
+          -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+          -DBUILD_BLOGC_MAKE_EMBEDDED=ON \
           -DBUILD_TESTING=ON \
           -S ${{ github.workspace }} \
           -G Ninja

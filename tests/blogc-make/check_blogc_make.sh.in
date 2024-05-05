@@ -5,7 +5,7 @@ set -xe -o pipefail
 export LC_ALL=C
 
 export BLOGC="@CMAKE_BINARY_DIR@/src/blogc/blogc"
-export BLOGC_MAKE="@CMAKE_BINARY_DIR@/src/blogc-make/blogc-make"
+export BLOGC_MAKE="@_BLOGC_MAKE@"
 
 TEMP="$(mktemp -d)"
 [[ -n "${TEMP}" ]]
