@@ -13,7 +13,7 @@ defaults:
 
 jobs:
   package:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -27,13 +27,6 @@ jobs:
           - linux-amd64-make-embedded-static
           - windows-i686
           - windows-amd64
-        os:
-          - ubuntu-latest
-        include:
-          - pkg: macos-amd64
-            os: macos-14-large
-          - pkg: macos-arm64
-            os: macos-14
 
     steps:
       - uses: actions/checkout@v4
@@ -42,17 +35,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          if [[ "${{ matrix.pkg }}" = "macos-amd64" ]]; then
-            if [[ $(uname -p) != x86_64 ]]; then
-              exit 1
-            fi
-          fi
-          if [[ "${{ matrix.pkg }}" = "macos-arm64" ]]; then
-            if [[ $(uname -p) != arm64 ]]; then
-              exit 1
-            fi
-          fi
-
           sudo apt install -y ninja-build ronn
           if [[ "${{ matrix.pkg }}" = "windows-i686" ]]; then
             sudo apt install -y gcc-mingw-w64-i686
