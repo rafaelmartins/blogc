@@ -80,3 +80,8 @@ jobs:
             --build ${{ github.workspace }}/build \
             --config Release \
             --target $([[ "${{ matrix.pkg }}" = "source" ]] && echo package_source || echo package)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.pkg }}
+          path: build/blogc-*
