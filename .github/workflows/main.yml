@@ -1,0 +1,121 @@
+name: Package
+
+on:
+  - push
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        pkg:
+          - source
+          - linux-amd64
+          - linux-amd64-static
+          - linux-amd64-make-embedded
+          - linux-amd64-make-embedded-static
+          - windows-i686
+          - windows-amd64
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y ninja-build ronn
+          if [[ "${{ matrix.pkg }}" = "windows-i686" ]]; then
+            sudo apt install -y gcc-mingw-w64-i686
+          fi
+          if [[ "${{ matrix.pkg }}" = "windows-amd64" ]]; then
+            sudo apt install -y gcc-mingw-w64-x86-64
+          fi
+          if [[ "${{ matrix.pkg }}" = *-static ]]; then
+            sudo apt install -y musl-dev
+          fi
+
+      - name: Configure CMake (Default)
+        if: ${{ !startsWith(matrix.pkg, 'windows-') }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=$([[ "${{ matrix.pkg }}" = *-static ]] && echo x86_64-linux-musl-gcc || echo gcc) \
+            -DCMAKE_C_FLAGS="-Wall" \
+            -DCMAKE_EXE_LINKER_FLAGS="$([[ "${{ matrix.pkg }}" = *-static ]] && echo -static)" \
+            -DCPACK_PACKAGE_FILE_NAME_SUFFIX="$([[ "${{ matrix.pkg }}" != "source" ]] && echo "${{ matrix.pkg }}")" \
+            -DBUILD_BLOGC_GIT_RECEIVER=$([[ "${{ matrix.pkg }}" != *-make-embedded* ]] && echo ON || echo OFF) \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_MAKE_EMBEDDED=$([[ "${{ matrix.pkg }}" = *-make-embedded* ]] && echo ON || echo OFF) \
+            -DBUILD_BLOGC_RUNSERVER=$([[ "${{ matrix.pkg }}" != *-make-embedded* ]] && echo ON || echo OFF) \
+            -DBUILD_MANPAGES=$([[ "${{ matrix.pkg }}" != *-make-embedded* ]] && echo ON || echo OFF) \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Configure CMake (Windows)
+        if: ${{ startsWith(matrix.pkg, 'windows-') }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=$([[ "${{ matrix.pkg }}" = "windows-i686" ]] && echo i686-w64-mingw32-gcc || echo x86_64-w64-mingw32-gcc) \
+            -DCMAKE_C_FLAGS="-Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4" \
+            -DCMAKE_SYSTEM_NAME=Windows \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Build
+        run: |
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release \
+            --target $([[ "${{ matrix.pkg }}" = "source" ]] && echo package_source || echo package)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.pkg }}
+          path: build/blogc-*
+
+  validate-source:
+    runs-on: ubuntu-latest
+    needs: package
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: source
+          path: source
+
+      - name: Install dependencies
+        run: sudo apt install -y ninja-build ronn
+
+      - name: Validate source
+        run: |
+          pushd source > /dev/null
+          sha512sum -c blogc-*.tar.xz.sha512
+          popd > /dev/null
+
+          tar -xvf source/blogc-*.tar.xz
+
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=gcc \
+            -DBUILD_BLOGC_GIT_RECEIVER=ON \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_RUNSERVER=ON \
+            -DBUILD_MANPAGES=ON \
+            -S ${{ github.workspace }}/blogc-* \
+            -G Ninja
+
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release
+
+          ${{ github.workspace }}/build/src/blogc/blogc -v | grep -iv Unknown
+          ${{ github.workspace }}/build/src/blogc-make/blogc-make -v | grep -iv Unknown
+          ${{ github.workspace }}/build/src/blogc-runserver/blogc-runserver -v | grep -iv Unknown
