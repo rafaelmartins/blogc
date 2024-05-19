@@ -3,10 +3,6 @@ name: Package
 on:
   - push
 
-concurrency:
-  group: package
-  cancel-in-progress: true
-
 defaults:
   run:
     shell: bash
@@ -85,3 +81,35 @@ jobs:
         with:
           name: ${{ matrix.pkg }}
           path: build/blogc-*
+
+  validate-source:
+    runs-on: ubuntu-latest
+    needs: package
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: source
+          path: source
+
+      - name: Install dependencies
+        run: sudo apt install -y ninja-build ronn
+
+      - name: Validate source
+        run: |
+          tar -xvf source/blogc-*.tar.xz
+
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=gcc \
+            -DBUILD_BLOGC_GIT_RECEIVER=ON \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_RUNSERVER=ON \
+            -DBUILD_MANPAGES=ON \
+            -S ${{ github.workspace }}/blogc-* \
+            -G Ninja
+
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release
+
+          ${{ github.workspace }}/build/src/blogc/blogc -v
