@@ -60,6 +60,7 @@ jobs:
             -B ${{ github.workspace }}/build \
             -DCMAKE_C_COMPILER=$(test "${{ matrix.pkg }}" = "windows-i686" && echo i686-w64-mingw32-gcc || echo x86_64-w64-mingw32-gcc) \
             -DCMAKE_C_FLAGS="-Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4" \
+            -DCMAKE_SYSTEM_NAME=Windows \
             -S ${{ github.workspace }} \
             -G Ninja
 
