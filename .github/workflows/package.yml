@@ -96,6 +96,7 @@ jobs:
 
       - name: Validate source
         run: |
+          sha512sum -c source/blogc-*.tar.xz.sha512
           tar -xvf source/blogc-*.tar.xz
 
           cmake \
@@ -112,4 +113,6 @@ jobs:
             --build ${{ github.workspace }}/build \
             --config Release
 
-          ${{ github.workspace }}/build/src/blogc/blogc -v
+          ${{ github.workspace }}/build/src/blogc/blogc -v | grep -iv Unknown
+          ${{ github.workspace }}/build/src/blogc-make/blogc-make -v | grep -iv Unknown
+          ${{ github.workspace }}/build/src/blogc-runserver/blogc-runserver -v | grep -iv Unknown
