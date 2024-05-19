@@ -96,7 +96,10 @@ jobs:
 
       - name: Validate source
         run: |
-          sha512sum -c source/blogc-*.tar.xz.sha512
+          pushd source > /dev/null
+          sha512sum -c blogc-*.tar.xz.sha512
+          popd > /dev/null
+
           tar -xvf source/blogc-*.tar.xz
 
           cmake \
