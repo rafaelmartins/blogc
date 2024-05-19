@@ -1,4 +1,4 @@
-name: Package
+name: Main
 
 on:
   - push
@@ -8,6 +8,78 @@ defaults:
     shell: bash
 
 jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - ubuntu-latest
+        cc:
+          - gcc
+          - clang
+        variant:
+          - default
+          - memcheck
+          - make-embedded
+        include:
+          - os: macos-latest
+            cc: clang
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies (Ubuntu)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: sudo apt install -y libcmocka-dev ninja-build ronn valgrind
+
+      - name: Install dependencies (MacOS)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          brew install cmocka coreutils groff ninja
+          gem install ronn-ng
+
+      - name: Configure CMake (default)
+        if: ${{ matrix.variant != 'make-embedded' }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DBUILD_BLOGC_GIT_RECEIVER=ON \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_RUNSERVER=ON \
+            -DBUILD_MANPAGES=ON \
+            -DBUILD_TESTING=ON \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Configure CMake (make-embedded)
+        if: ${{ matrix.variant == 'make-embedded' }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DBUILD_BLOGC_MAKE_EMBEDDED=ON \
+            -DBUILD_TESTING=ON \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Build
+        run: |
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: ctest --verbose --build-config Release
+
   package:
     runs-on: ubuntu-latest
 
