@@ -14,8 +14,8 @@ jobs:
         pkg:
           - source
           - linux-amd64
-          - linux-amd64-make-embedded
           - linux-amd64-static
+          - linux-amd64-make-embedded
           - windows-i686
           - windows-amd64
 
@@ -33,18 +33,18 @@ jobs:
           if [[ "${{ matrix.pkg }}" = "windows-amd64" ]]; then
             sudo apt install -y gcc-mingw-w64-x86-64
           fi
+          if [[ "${{ matrix.pkg }}" = *-static ]]; then
+            sudo apt install -y musl-dev
+          fi
 
       - name: Configure CMake (Default)
         if: ${{ !startsWith(matrix.pkg, 'windows-') }}
         run: |
-          if [[ "${{ matrix.pkg }}" = *-static ]]; then
-            export LDFLAGS="-all-static"
-          fi
-
           cmake \
             -B ${{ github.workspace }}/build \
-            -DCMAKE_C_COMPILER=gcc \
+            -DCMAKE_C_COMPILER=$(test "${{ matrix.pkg }}" = *-static && echo x86_64-linux-musl-gcc || echo gcc) \
             -DCMAKE_C_FLAGS="-Wall" \
+            -DCMAKE_EXE_LINKER_FLAGS="$(test "${{ matrix.pkg }}" = *-static && echo -static)" \
             -DBUILD_BLOGC_GIT_RECEIVER=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
             -DBUILD_BLOGC_MAKE=ON \
             -DBUILD_BLOGC_MAKE_EMBEDDED=$(test "${{ matrix.pkg }}" = "linux-amd64-make-embedded" && echo ON || echo OFF) \
