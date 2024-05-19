@@ -1,0 +1,69 @@
+name: Package
+
+on:
+  - push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        pkg:
+          - source
+          - linux-amd64
+          - linux-amd64-make-embedded
+          - linux-amd64-static
+          - windows-i686
+          - windows-amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y ninja-build ronn
+          if [[ "${{ matrix.pkg }}" = "windows-i686" ]]; then
+            sudo apt install -y gcc-mingw-w64-i686
+          fi
+          if [[ "${{ matrix.pkg }}" = "windows-amd64" ]]; then
+            sudo apt install -y gcc-mingw-w64-x86-64
+          fi
+
+      - name: Configure CMake (Default)
+        if: ${{ !startsWith(matrix.pkg, 'windows-') }}
+        run: |
+          if [[ "${{ matrix.pkg }}" = *-static ]]; then
+            export LDFLAGS="-all-static"
+          fi
+
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=gcc \
+            -DCMAKE_C_FLAGS="-Wall" \
+            -DBUILD_BLOGC_GIT_RECEIVER=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
+            -DBUILD_BLOGC_MAKE=ON \
+            -DBUILD_BLOGC_MAKE_EMBEDDED=$(test "${{ matrix.pkg }}" = "linux-amd64-make-embedded" && echo ON || echo OFF) \
+            -DBUILD_BLOGC_RUNSERVER=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
+            -DBUILD_MANPAGES=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Configure CMake (Windows)
+        if: ${{ startsWith(matrix.pkg, 'windows-') }}
+        run: |
+          cmake \
+            -B ${{ github.workspace }}/build \
+            -DCMAKE_C_COMPILER=$(test "${{ matrix.pkg }}" = "windows-i686" && echo i686-w64-mingw32-gcc || echo x86_64-w64-mingw32-gcc) \
+            -DCMAKE_C_FLAGS="-Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4" \
+            -S ${{ github.workspace }} \
+            -G Ninja
+
+      - name: Build
+        run: |
+          cmake \
+            --build ${{ github.workspace }}/build \
+            --config Release \
+            --target $(test "${{ matrix.pkg }}" = "source" && echo package_source || echo package)

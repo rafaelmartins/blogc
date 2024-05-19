@@ -9,6 +9,8 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#cmakedefine PACKAGE_VERSION "@PACKAGE_VERSION@"
+
 #cmakedefine HAVE_GETRUSAGE
 #cmakedefine HAVE_GETHOSTNAME
 
