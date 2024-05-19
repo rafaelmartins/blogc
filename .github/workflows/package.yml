@@ -42,14 +42,14 @@ jobs:
         run: |
           cmake \
             -B ${{ github.workspace }}/build \
-            -DCMAKE_C_COMPILER=$(test "${{ matrix.pkg }}" = *-static && echo x86_64-linux-musl-gcc || echo gcc) \
+            -DCMAKE_C_COMPILER=$([[ "${{ matrix.pkg }}" = *-static ]] && echo x86_64-linux-musl-gcc || echo gcc) \
             -DCMAKE_C_FLAGS="-Wall" \
-            -DCMAKE_EXE_LINKER_FLAGS="$(test "${{ matrix.pkg }}" = *-static && echo -static)" \
-            -DBUILD_BLOGC_GIT_RECEIVER=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
+            -DCMAKE_EXE_LINKER_FLAGS="$([[ "${{ matrix.pkg }}" = *-static ]] && echo -static)" \
+            -DBUILD_BLOGC_GIT_RECEIVER=$([[ "${{ matrix.pkg }}" != "linux-amd64-make-embedded" ]] && echo ON || echo OFF) \
             -DBUILD_BLOGC_MAKE=ON \
-            -DBUILD_BLOGC_MAKE_EMBEDDED=$(test "${{ matrix.pkg }}" = "linux-amd64-make-embedded" && echo ON || echo OFF) \
-            -DBUILD_BLOGC_RUNSERVER=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
-            -DBUILD_MANPAGES=$(test "${{ matrix.pkg }}" != "linux-amd64-make-embedded" && echo ON || echo OFF) \
+            -DBUILD_BLOGC_MAKE_EMBEDDED=$([[ "${{ matrix.pkg }}" = "linux-amd64-make-embedded" ]] && echo ON || echo OFF) \
+            -DBUILD_BLOGC_RUNSERVER=$([[ "${{ matrix.pkg }}" != "linux-amd64-make-embedded" ]] && echo ON || echo OFF) \
+            -DBUILD_MANPAGES=$([[ "${{ matrix.pkg }}" != "linux-amd64-make-embedded" ]] && echo ON || echo OFF) \
             -S ${{ github.workspace }} \
             -G Ninja
 
@@ -58,7 +58,7 @@ jobs:
         run: |
           cmake \
             -B ${{ github.workspace }}/build \
-            -DCMAKE_C_COMPILER=$(test "${{ matrix.pkg }}" = "windows-i686" && echo i686-w64-mingw32-gcc || echo x86_64-w64-mingw32-gcc) \
+            -DCMAKE_C_COMPILER=$([[ "${{ matrix.pkg }}" = "windows-i686" ]] && echo i686-w64-mingw32-gcc || echo x86_64-w64-mingw32-gcc) \
             -DCMAKE_C_FLAGS="-Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4" \
             -DCMAKE_SYSTEM_NAME=Windows \
             -S ${{ github.workspace }} \
@@ -69,4 +69,4 @@ jobs:
           cmake \
             --build ${{ github.workspace }}/build \
             --config Release \
-            --target $(test "${{ matrix.pkg }}" = "source" && echo package_source || echo package)
+            --target $([[ "${{ matrix.pkg }}" = "source" ]] && echo package_source || echo package)
