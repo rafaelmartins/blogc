@@ -12,7 +12,7 @@ defaults:
     shell: bash
 
 jobs:
-  test:
+  package:
     runs-on: ubuntu-latest
 
     strategy:
@@ -27,6 +27,13 @@ jobs:
           - linux-amd64-make-embedded-static
           - windows-i686
           - windows-amd64
+        os:
+          - ubuntu-latest
+        include:
+          - pkg: macos-amd64
+            os: macos-13
+          - pkg: macos-arm64
+            os: macos-14
 
     steps:
       - uses: actions/checkout@v4
