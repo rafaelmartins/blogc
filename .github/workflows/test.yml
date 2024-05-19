@@ -3,6 +3,14 @@ name: Test
 on:
   - push
 
+concurrency:
+  group: test
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
