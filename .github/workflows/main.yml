@@ -191,3 +191,29 @@ jobs:
           ${{ github.workspace }}/build/src/blogc/blogc -v | grep -iv Unknown
           ${{ github.workspace }}/build/src/blogc-make/blogc-make -v | grep -iv Unknown
           ${{ github.workspace }}/build/src/blogc-runserver/blogc-runserver -v | grep -iv Unknown
+
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - test
+      - validate-source
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Get release metadata
+        id: meta
+        run: |
+          version="$(echo "${{ github.ref }}" | sed 's,refs/tags/v,,')"
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          git tag -l --format="%(contents:subject)" "v${version}" > body.txt
+
+      - uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
+        with:
+          name: "blogc-${{ steps.meta.outputs.version }}"
+          artifacts: "artifacts/blogc-*"
+          bodyFile: body.txt
+          generateReleaseNotes: true
