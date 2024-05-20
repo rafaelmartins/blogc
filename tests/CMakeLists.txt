@@ -4,6 +4,10 @@
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka)
 
+find_program(BASH bash HINTS /bin /usr/bin REQUIRED)
+find_program(DIFF diff REQUIRED)
+find_program(TEE tee REQUIRED)
+
 try_compile(HAVE_LD_WRAP
     SOURCE_FROM_CONTENT
         main.c

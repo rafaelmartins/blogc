@@ -3,11 +3,13 @@
 
 cmake_minimum_required(VERSION 3.19)
 
+find_package(Git)
+
 if (EXISTS "${CMAKE_SOURCE_DIR}/version.cmake")
     include("${CMAKE_SOURCE_DIR}/version.cmake")
-elseif(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+elseif(EXISTS "${CMAKE_SOURCE_DIR}/.git" AND Git_FOUND)
     execute_process(
-        COMMAND git describe --abbrev=4 HEAD
+        COMMAND ${GIT_EXECUTABLE} describe --abbrev=4 HEAD
         OUTPUT_VARIABLE _blogc_version
         ERROR_VARIABLE _blogc_version_err
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -86,8 +88,6 @@ check_include_file(unistd.h HAVE_UNISTD_H)
 
 set(PACKAGE_VERSION "${BLOGC_VERSION}")
 configure_file(config.h.in config.h @ONLY)
-
-find_program(BASH bash HINTS /bin /usr/bin)
 
 include_directories(${CMAKE_BINARY_DIR})
 add_compile_definitions(HAVE_CONFIG_H)
