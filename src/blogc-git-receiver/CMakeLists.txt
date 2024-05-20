@@ -1,6 +1,16 @@
 # SPDX-FileCopyrightText: 2024 Rafael G. Martins <rafael@rafaelmartins.eng.br>
 # SPDX-License-Identifier: BSD-3-Clause
 
+if(NOT DEFINED HAVE_DIRENT_H OR
+   NOT DEFINED HAVE_ERRNO_H OR
+   NOT DEFINED HAVE_LIBGEN_H OR
+   NOT DEFINED HAVE_SYS_TYPES_H OR
+   NOT DEFINED HAVE_SYS_STAT_H OR
+   NOT DEFINED HAVE_TIME_H OR
+   NOT DEFINED HAVE_UNISTD_H)
+    message(FATAL_ERROR "Missing header dependencies for blogc-git-receiver")
+endif()
+
 add_library(libblogc_git_receiver STATIC
     post-receive.c
     post-receive.h
