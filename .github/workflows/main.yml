@@ -215,12 +215,12 @@ jobs:
         id: meta
         run: |
           version="$(echo "${{ github.ref }}" | sed 's,refs/tags/v,,')"
-          echo "version=${version}" >> $GITHUB_OUTPUT
-          git tag -l --format="%(contents:subject)" "v${version}" > body.txt
+          echo "name=$(git tag -l --format="%(contents:subject)" "v${version}")" >> $GITHUB_OUTPUT
+          git tag -l --format="%(contents:body)" "v${version}" > body.txt
 
       - uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
         with:
-          name: "blogc-${{ steps.meta.outputs.version }}"
+          name: ${{ steps.meta.outputs.name }}
           artifacts: "artifacts/blogc-*"
           bodyFile: body.txt
           generateReleaseNotes: true
