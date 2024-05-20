@@ -121,9 +121,8 @@ set(CPACK_SOURCE_IGNORE_FILES
     \\.git
     \\.gitignore
     \\.github/
-    build/
-    build-win/
     Testing/
+    "build.*/"
     ".*~$"
 )
 if(DEFINED CPACK_PACKAGE_NAME)
