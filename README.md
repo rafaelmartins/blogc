@@ -1,7 +1,5 @@
 # blogc
 
-![Build Status](https://github.com/blogc/blogc/workflows/yatr/badge.svg)
-
 A blog compiler.
 
 
