@@ -190,6 +190,7 @@ blogc_content_parse_inline_internal(const char *src, size_t src_len)
 
     size_t start_link = 0;
     char *link1 = NULL;
+    char *link2 = bc_strndup(src, strlen(src) - 1);
 
     bc_string_t *rv = bc_string_new();
 
