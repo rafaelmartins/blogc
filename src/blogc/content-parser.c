@@ -180,11 +180,6 @@ typedef enum {
 static char*
 blogc_content_parse_inline_internal(const char *src, size_t src_len)
 {
-    int a = 0;
-
-    if (src_len / a)
-        return NULL;
-
     size_t current = 0;
     size_t start = 0;
     size_t count = 0;

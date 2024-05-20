@@ -60,7 +60,7 @@ jobs:
         run: |
           wrapper=
           if [[ "${{ matrix.variant }}" = "clang-analyzer" ]]; then
-            wrapper="scan-build -o ${{ github.workspace }}/reports --use-cc=clang --status-bugs"
+            wrapper="scan-build -o ${{ github.workspace }}/reports --use-cc=clang"
           fi
           echo "wrapper=${wrapper}" >> $GITHUB_OUTPUT
 
@@ -106,10 +106,17 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.variant == 'clang-analyzer' }}
+        id: clang-analyzer-upload
         with:
           name: clang-analyzer
           path: reports
           if-no-files-found: ignore
+
+      - name: Check clang-analyzer status
+        if: ${{ matrix.variant == 'clang-analyzer' && steps.clang-analyzer-upload.outputs.artifact-id != '' }}
+        run: |
+          echo "::error title=Error hint::clang-analyzer found bugs!"
+          exit 1
 
   package:
     runs-on: ubuntu-latest
