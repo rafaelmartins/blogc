@@ -137,9 +137,7 @@ endif()
 
 if(WIN32)
     set(CPACK_GENERATOR "ZIP")
-endif()
-
-if(UNIX)
+elseif(UNIX)
     set(CPACK_GENERATOR "STGZ" "TXZ")
 endif()
 
